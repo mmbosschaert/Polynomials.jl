@@ -863,6 +863,8 @@ end
 
 # polynomial + polynomial when different types
 function Base.:+(p::P, q::Q) where {T,X,P <: AbstractPolynomial{T,X}, S,Y,Q <: AbstractPolynomial{S,Y}}
+    isconstant(p) && iszero(p.coeffs[1]) && return q
+    isconstant(q) && iszero(p.coeffs[1]) && return p
     isconstant(p) && return constantterm(p) + q
     isconstant(q) && return p + constantterm(q)
     assert_same_variable(X,Y)

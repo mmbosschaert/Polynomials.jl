@@ -39,6 +39,7 @@ struct Polynomial{T, X} <: StandardBasisPolynomial{T, X}
             @warn "ignoring the axis offset of the coefficient vector"
         end
         N = findlast(!iszero, coeffs)
+        N == nothing && S <:Vector && return new{eltype(S),X}(zeros(eltype(S),length(coeffs[1])))
         N == nothing && return new{T,X}(zeros(T,1))
         cs = T[coeffs[i] for i ∈ firstindex(coeffs):N]
         new{T,X}(cs)
@@ -75,6 +76,10 @@ end
 function Base.:+(p1::P1, p2::P2) where {T,X, P1<:Polynomial{T,X},
                                         S,   P2<:Polynomial{S,X}}
     n1, n2 = length(p1), length(p2)
+    N1 = findlast(!iszero, p1.coeffs)
+    N2 = findlast(!iszero, p2.coeffs)
+    N1 == nothing && return p2
+    N2 == nothing && return p1
     R = promote_type(T,S)
     Q = Polynomial{R,X}
     if n1 == n2
